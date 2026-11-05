@@ -184,20 +184,22 @@ python -c "import torch; print(torch.__version__)"
 
 ## PyTorch 실습 파일과 실행 순서
 
-[06주차_PyTorch로_신경망_학습하기.ipynb](notebooks/06주차_PyTorch로_신경망_학습하기.ipynb)를 엽니다. 공개 이미지 데이터 **CIFAR-10**(5만 장 학습, 1만 장 시험)을 torchvision으로 처음 한 번 내려받습니다(약 170MB, `data/cifar10`에 저장되며 저장소에는 올리지 않습니다). 기존 6주차 불량 분류·검증 실습은 그대로 있습니다.
+[06주차_PyTorch로_신경망_학습하기.ipynb](notebooks/06주차_PyTorch로_신경망_학습하기.ipynb)를 엽니다. 6주차 신경망 실습과 같은 순서(데이터 → DataLoader → class → 한 배치 → main → 손실 곡선 → 정확도)이고, 데이터만 공정 표 대신 공개 이미지 데이터 **CIFAR-10**(5만 장 학습, 1만 장 시험)을, 모델만 `SmallCNN`을 씁니다. 데이터는 처음 한 번 내려받습니다(약 170MB, `data/cifar10`에 저장되며 저장소에는 올리지 않습니다). 기존 6주차 불량 분류·검증 실습은 그대로 있습니다.
 
-**이 실습은 Colab에서 진행합니다.** 위 [Colab에서 바로 열기](#colab에서-바로-열기) 표의 6주차 버튼을 누르고, 실행 전에 **런타임 → 런타임 유형 변경 → T4 GPU**를 선택합니다. 전체 데이터로 5바퀴 학습하며 CPU와 GPU의 속도 차이를 직접 봅니다. VS Code로 하던 분도 이 실습만 Colab에서 합니다. 노트북 PC에는 보통 NVIDIA GPU가 없어 비교가 되지 않기 때문입니다.
+**이 실습은 Colab에서 진행합니다.** 위 [Colab에서 바로 열기](#colab에서-바로-열기) 표의 6주차 버튼을 누르고, 실행 전에 **런타임 → 런타임 유형 변경 → T4 GPU**를 선택합니다. 전체 데이터로 5바퀴 학습하며 CPU와 GPU의 시간 차이를 직접 봅니다. 노트북 PC에는 보통 NVIDIA GPU가 없어 비교가 되지 않으므로 VS Code로 하던 분도 이 실습만 Colab에서 합니다.
 
-VS Code에서도 CPU로 축소 실행(학습용 1만 장, 2바퀴)은 됩니다. 이 경우 터미널에서 `conda activate semi-ai` 후 `pip install torchvision==0.15.2`를 한 번 실행합니다. GPU 비교 셀은 CPU 시간만 출력합니다.
+VS Code에서 CPU로 실행하면 1바퀴만 학습합니다(약 1분). 이 경우 터미널에서 `conda activate semi-ai` 후 `pip install torchvision==0.15.2`를 한 번 실행합니다. 시간 비교 셀은 CPU 시간만 출력합니다.
 
 | 구역 | 확인할 내용 |
 |---|---|
-| 1 | `device` 확인 (cuda 또는 cpu) |
-| 2 | CIFAR-10 내려받기, 한 장 = (3, 32, 32) = 3,072개 숫자, 사진 보기 |
-| 3 | DataLoader의 128장 배치 |
-| 4 | `class SmallCNN(nn.Module)`: Conv2d → ReLU → MaxPool 두 번, 층별 모양 변화 |
-| 5 | zero_grad → backward → step, 가중치 변화량 |
-| 6 | **CPU와 GPU 속도 비교** (50배치만 돌려 1 epoch 예상 시간 계산) |
-| 7~8 | `train_model`로 CNN 학습, 손실·정확도 곡선, 예측 사진 보기 |
-| 9 | `nn.RNN`의 입력 모양 (묶음, 시간, 특징) 확인. 작은 센서 시계열 예시 |
-| 10 | 역할 정리, 직접 바꾸기 |
+| 1 | 도구 불러오기, `device` 확인 (cuda 또는 cpu), CIFAR-10 내려받기 |
+| 2 | 한 장 = (3, 32, 32) = 3,072개 숫자, 사진 6장 보기 |
+| 3 | DataLoader의 128장 배치, 한 바퀴 391배치 |
+| 4 | `class SmallCNN(nn.Module)`: Conv2d → ReLU → MaxPool 두 번 → Linear, 층별 모양과 파라미터 개수 |
+| 5 | 한 배치에서 zero_grad → backward → step, 가중치 변화량 |
+| 6 | `main`으로 전체 학습 (GPU 5바퀴, CPU 1바퀴), 바퀴별 손실과 시간 |
+| 6 · 시간 비교 | **같은 모델을 CPU와 GPU에서 20배치씩 돌려 한 바퀴 예상 시간 비교** |
+| 7 | 손실 곡선 |
+| 8 | 학습 전·후 시험 정확도, 시험 사진 8장의 예측 |
+| 9 | 역할 정리, 직접 바꾸기 (batch_size 256) |
+| 선택 | `nn.RNN`의 입력 모양 (묶음, 시간, 특징) 확인. 작은 센서 시계열 예시 |
